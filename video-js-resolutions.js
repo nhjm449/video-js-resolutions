@@ -288,6 +288,7 @@ videojs.plugin('resolutions', function(options) {
 
     // pause playback
     this.pause();
+    this.autoplay(false); // In at least Firefox, autoplay is triggered upon setting src
 
     // attempts to stop the download of the existing video
     this.resolutions_.stopStream();
@@ -317,6 +318,16 @@ videojs.plugin('resolutions', function(options) {
       // remember this selection
       vjs.setLocalStorage('videojs_preferred_res', parseInt(new_source.index, 10));
     });
+  };
+
+  player.changeResolutionSrc = function(sources) {
+    var source = player.resolutions_.selectSource(sources);
+    console.log('setting src:',source);
+    player.changeResolution(source);
+
+    player.controlBar.removeChild('resolutionsButton');
+    var button = new ResolutionsButton(player, { name: 'resolutionsButton' });
+    player.controlBar.addChild(button);
   };
 
   /* Resolution Menu Items
@@ -387,7 +398,7 @@ videojs.plugin('resolutions', function(options) {
   };
 
   ResolutionButton.prototype.createItems = function(){
-    var resolutions = this.sourceResolutions_ = this.player_.resolutions_.options_['sourceResolutions'];
+    var resolutions = this.sourceResolutions_ = this.player_.resolutions_.options_['sourceResolutions'] || [];
     var items = [];
     for (var i = 0; i < resolutions.length; i++) {
       items.push(new ResolutionMenuItem(this.player_, {
@@ -426,7 +437,7 @@ videojs.plugin('resolutions', function(options) {
   // when the player is ready, add the resolution button to the control bar
   player.ready(function(){
     player.changeResolution(source);
-    var button = new ResolutionsButton(player);
+    var button = new ResolutionsButton(player, { name: 'resolutionsButton' });
     player.controlBar.addChild(button);
   });
 });
