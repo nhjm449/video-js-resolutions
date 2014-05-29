@@ -293,6 +293,11 @@ videojs.plugin('resolutions', function(options) {
     // attempts to stop the download of the existing video
     this.resolutions_.stopStream();
 
+    // make sure we don't trigger an ad (for videojs-contrib-ads)
+    if (this.ads) {
+      this.ads.lastSrc = new_source.src;
+    }
+
     // HTML5 tends to not recover from reloading the tech but it can
     // generally handle changing src.  Flash generally cannot handle
     // changing src but can reload its tech.
